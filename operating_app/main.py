@@ -51,6 +51,9 @@ def power_loop():
     
     last_ui_update = 0
     
+    # Also added the macOS truncated app names so they get explicitly caught
+    TARGET_KEYWORDS = ['Chrome', 'Helper', 'Spotify', 'Slack', 'Discord', 'Code', 'Electron', 'node', 'app.py', 'Go', 'Br', 'Applicat', 'run']
+    
     while True:
         if not running:
             time.sleep(1)
@@ -73,7 +76,7 @@ def power_loop():
         all_procs = []
         try:
             attrs = ['pid', 'name', 'username', 'status']
-            if needs_ui_update:
+            if needs_ui_update or throttle_needed:
                 attrs.append('cpu_percent')
                 
             for proc in psutil.process_iter(attrs):
@@ -86,12 +89,14 @@ def power_loop():
             
         if throttle_needed:
             for pinfo in all_procs:
-                if pinfo.get('name') and pinfo.get('username') == current_user:
-                    is_whitelisted = any(w.lower() in pinfo['name'].lower() for w in WHITELIST)
+                if pinfo.get('username') == current_user:
+                    name = pinfo.get('name') or "Unknown"
+                    is_whitelisted = any(w.lower() in name.lower() for w in WHITELIST)
                     if not is_whitelisted and pinfo.get('status') != psutil.STATUS_STOPPED:
-                        # Sleep it if it's a known target OR if it is actively causing the high load (>5% CPU)
-                        is_target = any(k.lower() in pinfo['name'].lower() for k in TARGET_KEYWORDS)
-                        is_heavy = pinfo.get('cpu_percent', 0) > 5.0
+                        is_target = any(k.lower() in name.lower() for k in TARGET_KEYWORDS)
+                        cpu_p = pinfo.get('cpu_percent')
+                        if cpu_p is None: cpu_p = 0
+                        is_heavy = cpu_p > 5.0
                         
                         if (is_target or is_heavy) and pinfo['pid'] not in suspended_pids:
                             try:
