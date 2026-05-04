@@ -38,8 +38,9 @@ def find_target_processes(current_user):
             if pinfo.get('username') == current_user and not is_whitelisted and pinfo.get('status') != psutil.STATUS_STOPPED:
                 # Is it a target background task?
                 is_target = any(keyword.lower() in name.lower() for keyword in TARGET_KEYWORDS)
+                is_heavy = pinfo.get('cpu_percent', 0) > 5.0
                 
-                if is_target:
+                if is_target or is_heavy:
                     targets.append(proc)
         except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
             pass

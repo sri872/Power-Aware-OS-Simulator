@@ -89,8 +89,11 @@ def power_loop():
                 if pinfo.get('name') and pinfo.get('username') == current_user:
                     is_whitelisted = any(w.lower() in pinfo['name'].lower() for w in WHITELIST)
                     if not is_whitelisted and pinfo.get('status') != psutil.STATUS_STOPPED:
+                        # Sleep it if it's a known target OR if it is actively causing the high load (>5% CPU)
                         is_target = any(k.lower() in pinfo['name'].lower() for k in TARGET_KEYWORDS)
-                        if is_target and pinfo['pid'] not in suspended_pids:
+                        is_heavy = pinfo.get('cpu_percent', 0) > 5.0
+                        
+                        if (is_target or is_heavy) and pinfo['pid'] not in suspended_pids:
                             try:
                                 os.kill(pinfo['pid'], signal.SIGSTOP)
                                 suspended_pids.add(pinfo['pid'])
