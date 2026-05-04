@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Power-Aware Task Manager</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="text/javascript" src="/eel.js"></script>
+</head>
+<body>
+    <div class="header">
+        <h1>CPU OS <span>Power-Aware Task Manager Simulator</span></h1>
+        <div class="controls">
+            <select id="runMode" onchange="toggleRunMode()">
+                <option value="simulated">Simulated Mode</option>
+                <option value="real">Real System Deployment</option>
+            </select>
+            <select id="powerMode" onchange="applySettings()">
+                <option value="balanced">Balanced Mode</option>
+                <option value="performance">Performance Mode</option>
+                <option value="powersaver">Power Saver</option>
+            </select>
+            <button id="startBtn" onclick="toggleSimulation()">Start</button>
+            <button class="btn-danger" onclick="resetSimulation()" id="resetBtn">Reset</button>
+        </div>
+    </div>
+
+    <div class="dashboard">
+        <div class="overview-grid">
+            <div class="stat-box">
+                <div class="stat-title">Temperature / Load</div>
+                <div class="stat-value" id="sysTemp">40.0°C</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-title">Current Freq / Status</div>
+                <div class="stat-value" id="sysFreq">1.2 GHz</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-title">Power / Suspended Apps</div>
+                <div class="stat-value" id="sysPower">6 W</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-title">Battery</div>
+                <div class="stat-value" id="sysBattery">100.0%</div>
+            </div>
+        </div>
+
+        <div class="card" style="grid-column: 1 / 2; grid-row: 2 / 3;">
+            <h2>Processes</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>PID</th>
+                            <th>Name</th>
+                            <th>CPU %</th>
+                            <th>State</th>
+                        </tr>
+                    </thead>
+                    <tbody id="processTable">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="sidebar" style="grid-column: 2 / 3; grid-row: 2 / 3;">
+            <div class="card">
+                <h2>CPU Usage</h2>
+                <div class="cores-container" id="coresContainer">
+                    <div class="core-row"><div class="core-label">Core 0</div><div class="core-bar-bg"><div class="core-bar-fill" id="core0Bar"></div></div><div class="core-value" id="core0Val">0%</div></div>
+                    <div class="core-row"><div class="core-label">Core 1</div><div class="core-bar-bg"><div class="core-bar-fill" id="core1Bar"></div></div><div class="core-value" id="core1Val">0%</div></div>
+                    <div class="core-row"><div class="core-label">Core 2</div><div class="core-bar-bg"><div class="core-bar-fill" id="core2Bar"></div></div><div class="core-value" id="core2Val">0%</div></div>
+                    <div class="core-row"><div class="core-label">Core 3</div><div class="core-bar-bg"><div class="core-bar-fill" id="core3Bar"></div></div><div class="core-value" id="core3Val">0%</div></div>
+                </div>
+            </div>
+            <div class="card" style="flex: 1;">
+                <h2>Power Consumption (W)</h2>
+                <div class="chart-container">
+                    <canvas id="powerChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Power-Aware Task Manager</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="header">
+        <h1>CPU OS <span>Power-Aware Task Manager Simulator</span></h1>
+        <div class="controls">
+            <select id="powerMode" onchange="applySettings()">
+                <option value="balanced">Balanced Mode</option>
+                <option value="performance">Performance Mode</option>
+                <option value="powersaver">Power Saver</option>
+            </select>
+            <select id="simSpeed" onchange="applySettings()">
+                <option value="1">1x Speed</option>
+                <option value="5">5x Speed</option>
+                <option value="10">10x Speed</option>
+            </select>
+            <input type="number" id="processCount" value="10" min="1" max="20" style="width: 50px; background: var(--surface-color); color: var(--text-primary); border: 1px solid var(--border-color); padding: 5px; border-radius: 6px;">
+            <input type="number" id="startBattery" value="100" min="1" max="100" style="width: 50px; background: var(--surface-color); color: var(--text-primary); border: 1px solid var(--border-color); padding: 5px; border-radius: 6px;" title="Start Battery %">
+            <button id="startBtn" onclick="toggleSimulation()">Start</button>
+            <button class="btn-danger" onclick="resetSimulation()">Reset</button>
+        </div>
+    </div>
+
+    <div class="dashboard">
+        <div class="overview-grid">
+            <div class="stat-box">
+                <div class="stat-title">Temperature</div>
+                <div class="stat-value" id="sysTemp">40.0°C</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-title">Current Freq</div>
+                <div class="stat-value" id="sysFreq">1.2 GHz</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-title">Power Draw</div>
+                <div class="stat-value" id="sysPower">6 W</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-title">Battery</div>
+                <div class="stat-value" id="sysBattery">100.0%</div>
+            </div>
+        </div>
+
+        <div class="card" style="grid-column: 1 / 2; grid-row: 2 / 3;">
+            <h2>Processes</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>PID</th>
+                            <th>Name</th>
+                            <th>Priority</th>
+                            <th>CPU %</th>
+                            <th>State</th>
+                            <th>Energy Used</th>
+                        </tr>
+                    </thead>
+                    <tbody id="processTable">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="sidebar" style="grid-column: 2 / 3; grid-row: 2 / 3;">
+            <div class="card">
+                <h2>CPU Usage</h2>
+                <div class="cores-container">
+                    <div class="core-row"><div class="core-label">Core 0</div><div class="core-bar-bg"><div class="core-bar-fill" id="core0Bar"></div></div><div class="core-value" id="core0Val">0%</div></div>
+                    <div class="core-row"><div class="core-label">Core 1</div><div class="core-bar-bg"><div class="core-bar-fill" id="core1Bar"></div></div><div class="core-value" id="core1Val">0%</div></div>
+                    <div class="core-row"><div class="core-label">Core 2</div><div class="core-bar-bg"><div class="core-bar-fill" id="core2Bar"></div></div><div class="core-value" id="core2Val">0%</div></div>
+                    <div class="core-row"><div class="core-label">Core 3</div><div class="core-bar-bg"><div class="core-bar-fill" id="core3Bar"></div></div><div class="core-value" id="core3Val">0%</div></div>
+                </div>
+            </div>
+            <div class="card" style="flex: 1;">
+                <h2>Power Consumption (W)</h2>
+                <div class="chart-container">
+                    <canvas id="powerChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
