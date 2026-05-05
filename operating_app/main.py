@@ -75,13 +75,19 @@ def power_loop():
             
         all_procs = []
         try:
-            attrs = ['pid', 'name', 'username', 'status', 'cmdline']
+            attrs = ['pid', 'name', 'username', 'status']
             if needs_ui_update or throttle_needed:
                 attrs.append('cpu_percent')
                 
             for proc in psutil.process_iter(attrs):
                 try:
-                    all_procs.append(proc.info)
+                    pinfo = proc.info
+                    # Fetch cmdline separately so AccessDenied doesn't drop the whole process
+                    try:
+                        pinfo['cmdline'] = proc.cmdline()
+                    except (psutil.AccessDenied, psutil.ZombieProcess):
+                        pinfo['cmdline'] = []
+                    all_procs.append(pinfo)
                 except (psutil.NoSuchProcess, psutil.AccessDenied):
                     pass
         except Exception:
