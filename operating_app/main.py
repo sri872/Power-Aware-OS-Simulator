@@ -75,7 +75,7 @@ def power_loop():
             
         all_procs = []
         try:
-            attrs = ['pid', 'name', 'username', 'status']
+            attrs = ['pid', 'name', 'username', 'status', 'cmdline']
             if needs_ui_update or throttle_needed:
                 attrs.append('cpu_percent')
                 
@@ -91,6 +91,12 @@ def power_loop():
             for pinfo in all_procs:
                 if pinfo.get('username') == current_user:
                     name = pinfo.get('name') or "Unknown"
+                    cmdline = pinfo.get('cmdline') or []
+                    if cmdline and len(cmdline) > 0:
+                        exe_name = os.path.basename(cmdline[0])
+                        if exe_name and not exe_name.startswith('-'):
+                            name = exe_name
+                            
                     is_whitelisted = any(w.lower() in name.lower() for w in WHITELIST)
                     if not is_whitelisted and pinfo.get('status') != psutil.STATUS_STOPPED:
                         is_target = any(k.lower() in name.lower() for k in TARGET_KEYWORDS)
@@ -130,11 +136,21 @@ def power_loop():
                         if pinfo['pid'] not in suspended_pids:
                             suspended_pids.add(pinfo['pid'])
                         name = pinfo.get('name') or "Unknown"
+                        cmdline = pinfo.get('cmdline') or []
+                        if cmdline and len(cmdline) > 0:
+                            exe_name = os.path.basename(cmdline[0])
+                            if exe_name and not exe_name.startswith('-'):
+                                name = exe_name
                         proc_list.append({'pid': pinfo['pid'], 'name': name, 'state': 'Energy-Sleep', 'cpuPercent': 0, 'energyUsed': 0})
                 
                 for pinfo in sorted_procs:
                     if pinfo['pid'] not in suspended_pids and len(proc_list) < 20:
                         name = pinfo.get('name') or "Unknown"
+                        cmdline = pinfo.get('cmdline') or []
+                        if cmdline and len(cmdline) > 0:
+                            exe_name = os.path.basename(cmdline[0])
+                            if exe_name and not exe_name.startswith('-'):
+                                name = exe_name
                         proc_list.append({'pid': pinfo['pid'], 'name': name, 'state': 'Running', 'cpuPercent': round(pinfo['cpu_percent'], 1), 'energyUsed': 0})
             except Exception as e:
                 print("Error rendering table:", e)
